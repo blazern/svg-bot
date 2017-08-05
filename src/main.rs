@@ -139,7 +139,7 @@ fn perform_line(position_type: &Position, params: &Vec<f32>, svg_area: &Rect, pa
     assert!(params.len() >= 2);
     assert_eq!(params.len() % 2, 0);
 
-    let mut current_point = SvgPoint::new(*params.get(0).unwrap(), *params.get(1).unwrap(), svg_area.clone(), paint_area.clone());
+    let mut current_point = SvgPoint::new(*params.get(0).unwrap(), *params.get(1).unwrap(), &svg_area, &paint_area);
     move_mouse(&ScreenPoint::from(current_point.clone()));
     down_mouse();
 
@@ -152,7 +152,7 @@ fn perform_line(position_type: &Position, params: &Vec<f32>, svg_area: &Rect, pa
                 current_point = current_point.offset(x, y);
             }
             &Position::Absolute => {
-                current_point = SvgPoint::new(x, y, svg_area.clone(), paint_area.clone());
+                current_point = SvgPoint::new(x, y, &svg_area, &paint_area);
             }
         }
         move_mouse(&ScreenPoint::from(current_point.clone()));
@@ -179,14 +179,14 @@ fn perform_cubic_curve(current_point: &SvgPoint, position_type: &Position, param
     let pos3: SvgPoint;
     match position_type {
         &Position::Absolute => {
-            pos1 = SvgPoint::new(*params.get(0).unwrap(), *params.get(1).unwrap(), svg_area.clone(), paint_area.clone());
-            pos2 = SvgPoint::new(*params.get(2).unwrap(), *params.get(3).unwrap(), svg_area.clone(), paint_area.clone());
-            pos3 = SvgPoint::new(*params.get(4).unwrap(), *params.get(5).unwrap(), svg_area.clone(), paint_area.clone());
+            pos1 = SvgPoint::new(*params.get(0).unwrap(), *params.get(1).unwrap(), &svg_area, &paint_area);
+            pos2 = SvgPoint::new(*params.get(2).unwrap(), *params.get(3).unwrap(), &svg_area, &paint_area);
+            pos3 = SvgPoint::new(*params.get(4).unwrap(), *params.get(5).unwrap(), &svg_area, &paint_area);
         }
         &Position::Relative => {
-            pos1 = SvgPoint::new(*params.get(0).unwrap() + pos0.x(), *params.get(1).unwrap() + pos0.y(), svg_area.clone(), paint_area.clone());
-            pos2 = SvgPoint::new(*params.get(2).unwrap() + pos0.x(), *params.get(3).unwrap() + pos0.y(), svg_area.clone(), paint_area.clone());
-            pos3 = SvgPoint::new(*params.get(4).unwrap() + pos0.x(), *params.get(5).unwrap() + pos0.y(), svg_area.clone(), paint_area.clone());
+            pos1 = SvgPoint::new(*params.get(0).unwrap() + pos0.x(), *params.get(1).unwrap() + pos0.y(), &svg_area, &paint_area);
+            pos2 = SvgPoint::new(*params.get(2).unwrap() + pos0.x(), *params.get(3).unwrap() + pos0.y(), &svg_area, &paint_area);
+            pos3 = SvgPoint::new(*params.get(4).unwrap() + pos0.x(), *params.get(5).unwrap() + pos0.y(), &svg_area, &paint_area);
         }
     }
     let mut line_coords: Vec<f32> = Vec::new();

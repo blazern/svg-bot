@@ -13,7 +13,7 @@ fn svg_point_constructs_correctly() {
     let svg_area = Rect::new(2f32, 4f32, 5f32, 6f32);
     let screen_area = Rect::new(6f32, 5f32, 4f32, 3f32);
 
-    let point = SvgPoint::new(x, y, svg_area.clone(), screen_area.clone());
+    let point = SvgPoint::new(x, y, &svg_area, &screen_area);
 
     assert_eq!(x, point.x());
     assert_eq!(y, point.y());
@@ -28,7 +28,7 @@ fn screen_point_constructs_correctly() {
     let svg_area = Rect::new(2f32, 4f32, 5f32, 6f32);
     let screen_area = Rect::new(6f32, 5f32, 4f32, 3f32);
 
-    let point = ScreenPoint::new(x, y, svg_area.clone(), screen_area.clone());
+    let point = ScreenPoint::new(x, y, &svg_area, &screen_area);
 
     assert_eq!(x, point.x());
     assert_eq!(y, point.y());
@@ -43,7 +43,7 @@ fn svg_point_constructed_from_screen_point_has_different_coords() {
     let svg_area = Rect::new(2f32, 4f32, 5f32, 6f32);
     let screen_area = Rect::new(6f32, 5f32, 4f32, 3f32);
 
-    let svg_point = ScreenPoint::new(x, y, svg_area.clone(), screen_area.clone());
+    let svg_point = ScreenPoint::new(x, y, &svg_area, &screen_area);
     let screen_point = SvgPoint::from(svg_point.clone());
 
     assert_ne!(svg_point.x(), screen_point.x());
@@ -57,7 +57,7 @@ fn screen_point_constructed_from_svg_point_has_different_coords() {
     let svg_area = Rect::new(2f32, 4f32, 5f32, 6f32);
     let screen_area = Rect::new(6f32, 5f32, 4f32, 3f32);
 
-    let svg_point = SvgPoint::new(x, y, svg_area.clone(), screen_area.clone());
+    let svg_point = SvgPoint::new(x, y, &svg_area, &screen_area);
     let screen_point = ScreenPoint::from(svg_point.clone());
 
     assert_ne!(svg_point.x(), screen_point.x());
@@ -71,7 +71,7 @@ fn svg_point_constructed_from_screen_point_has_same_areas() {
     let svg_area = Rect::new(2f32, 4f32, 5f32, 6f32);
     let screen_area = Rect::new(6f32, 5f32, 4f32, 3f32);
 
-    let svg_point = ScreenPoint::new(x, y, svg_area.clone(), screen_area.clone());
+    let svg_point = ScreenPoint::new(x, y, &svg_area, &screen_area);
     let screen_point = SvgPoint::from(svg_point.clone());
 
     assert_eq!(*svg_point.svg_area(), *screen_point.svg_area());
@@ -85,7 +85,7 @@ fn screen_point_constructed_from_svg_point_has_same_areas() {
     let svg_area = Rect::new(2f32, 4f32, 5f32, 6f32);
     let screen_area = Rect::new(6f32, 5f32, 4f32, 3f32);
 
-    let svg_point = SvgPoint::new(x, y, svg_area.clone(), screen_area.clone());
+    let svg_point = SvgPoint::new(x, y, &svg_area, &screen_area);
     let screen_point = ScreenPoint::from(svg_point.clone());
 
     assert_eq!(*svg_point.svg_area(), *screen_point.svg_area());
@@ -99,7 +99,7 @@ fn points_recalculation_works() {
     let svg_area = Rect::new(2f32, 4f32, 5f32, 6f32);
     let screen_area = Rect::new(6f32, 5f32, 4f32, 3f32);
 
-    let svg_point = SvgPoint::new(x, y, svg_area.clone(), screen_area.clone());
+    let svg_point = SvgPoint::new(x, y, &svg_area, &screen_area);
     let screen_point = ScreenPoint::from(svg_point.clone());
     let recalculated_svg_point = SvgPoint::from(screen_point.clone());
 
@@ -109,7 +109,7 @@ fn points_recalculation_works() {
 
 #[test]
 fn can_offset_svg_point() {
-    let point = SvgPoint::new(1f32, 3f32, Rect::new(2f32, 4f32, 5f32, 6f32), Rect::new(6f32, 5f32, 4f32, 3f32));
+    let point = SvgPoint::new(1f32, 3f32, &Rect::new(2f32, 4f32, 5f32, 6f32), &Rect::new(6f32, 5f32, 4f32, 3f32));
 
     let offset_x = 123f32;
     let offset_y = 321f32;
@@ -120,7 +120,7 @@ fn can_offset_svg_point() {
 
 #[test]
 fn can_offset_screen_point() {
-    let point = ScreenPoint::new(1f32, 3f32, Rect::new(2f32, 4f32, 5f32, 6f32), Rect::new(6f32, 5f32, 4f32, 3f32));
+    let point = ScreenPoint::new(1f32, 3f32, &Rect::new(2f32, 4f32, 5f32, 6f32), &Rect::new(6f32, 5f32, 4f32, 3f32));
 
     let offset_x = 123f32;
     let offset_y = 321f32;
