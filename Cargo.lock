@@ -2,8 +2,14 @@
 name = "svg-bot"
 version = "0.1.0"
 dependencies = [
+ "assert_approx_eq 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "svg 0.5.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
+
+[[package]]
+name = "assert_approx_eq"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "svg"
@@ -11,4 +17,5 @@ version = "0.5.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [metadata]
+"checksum assert_approx_eq 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "1a38a0dd5749f34b8a61d7c1cc47e68c7955676bd17e1b25dd1d30901c556655"
 "checksum svg 0.5.6 (registry+https://github.com/rust-lang/crates.io-index)" = "6569d8ee08322afcc9f3eb19a9af4ebbb5a2502a4048cb32f741020a02b0d668"
