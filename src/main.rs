@@ -7,6 +7,8 @@ use std::thread;
 
 mod point;
 mod rect;
+mod mouse;
+mod my_error;
 
 use point::SvgPoint;
 use point::ScreenPoint;
@@ -60,7 +62,7 @@ fn main() {
             }
             _ => {}
         }
-        up_mouse();
+        mouse::up().unwrap();
     }
 }
 
@@ -140,8 +142,9 @@ fn perform_line(position_type: &Position, params: &Vec<f32>, svg_area: &Rect, pa
     assert_eq!(params.len() % 2, 0);
 
     let mut current_point = SvgPoint::new(*params.get(0).unwrap(), *params.get(1).unwrap(), &svg_area, &paint_area);
-    move_mouse(&ScreenPoint::from(current_point.clone()));
-    down_mouse();
+    let current_screen_point = ScreenPoint::from(current_point.clone());
+    mouse::move_to(current_screen_point.x(), current_screen_point.y()).unwrap();
+    mouse::down().unwrap();
 
     let mut index = 2;
     while index < params.len() {
@@ -155,7 +158,8 @@ fn perform_line(position_type: &Position, params: &Vec<f32>, svg_area: &Rect, pa
                 current_point = SvgPoint::new(x, y, &svg_area, &paint_area);
             }
         }
-        move_mouse(&ScreenPoint::from(current_point.clone()));
+        let current_screen_point = ScreenPoint::from(current_point.clone());
+        mouse::move_to(current_screen_point.x(), current_screen_point.y()).unwrap();
         index += 2;
     }
 
@@ -163,7 +167,7 @@ fn perform_line(position_type: &Position, params: &Vec<f32>, svg_area: &Rect, pa
 }
 
 fn perform_move(position_type: &Position, params: &Vec<f32>, svg_area: &Rect, paint_area: &Rect) -> SvgPoint {
-    up_mouse();
+    mouse::up().unwrap();
     // If move has more than 2 points than they must be treated as implicit line.
     perform_line(position_type, params, svg_area, paint_area)
 }
@@ -208,32 +212,4 @@ fn print_params(command_name: &str, params: &svg::node::element::path::Parameter
     for param in params.iter() {
         println!("\t{}", param);
     }
-}
-
-fn down_mouse() {
-    let status = std::process::Command::new("xdotool")
-                     .arg("mousedown")
-                     .arg("1")
-                     .status()
-                     .expect("Failed to mousedown");
-    assert!(status.success());
-}
-
-fn move_mouse(point: &ScreenPoint) {
-    let status = std::process::Command::new("xdotool")
-                     .arg("mousemove")
-                     .arg(point.x().to_string())
-                     .arg(point.y().to_string())
-                     .status()
-                     .expect("Failed to mousemove");
-    assert!(status.success());
-}
-
-fn up_mouse() {
-    let status = std::process::Command::new("xdotool")
-                     .arg("mouseup")
-                     .arg("1")
-                     .status()
-                     .expect("Failed to mousedown");
-    assert!(status.success());
 }
