@@ -32,13 +32,15 @@ impl Painter {
             &Command::CubicCurve(ref position_type, ref params) => {
                 self.perform_cubic_curve(&position_type, &params.to_vec())?;
             },
+            &Command::Close => {
+                self.perform_close()?;
+            },
             &Command::QuadraticCurve(_, ref params) => print_params("QuadraticCurve", &params),
             &Command::HorizontalLine(_, ref params) => print_params("HorizontalLine", &params),
             &Command::VerticalLine(_, ref params) => print_params("VerticalLine", &params),
             &Command::SmoothQuadraticCurve(_, ref params) => print_params("SmoothQuadraticCurve", &params),
             &Command::SmoothCubicCurve(_, ref params) => print_params("SmoothCubicCurve", &params),
             &Command::EllipticalArc(_, ref params) => print_params("EllipticalArc", &params),
-            &Command::Close => println!("Close!"),
         }
         Ok(())
     }
@@ -130,6 +132,18 @@ impl Painter {
             }
         }
         
+        self.perform_line(&Position::Absolute, &line_coords)
+    }
+
+    pub fn perform_close(&mut self) -> Result<(), MyError> {
+        if self.subpath_initial_point.is_none() {
+            return Err(MyError::new("For some reason subpath_initial_point is_none in perform_close".to_string()));
+        }
+        let mut line_coords: Vec<f32> = Vec::new();
+        line_coords.push(self.current_point.x());
+        line_coords.push(self.current_point.y());
+        line_coords.push(self.subpath_initial_point.as_ref().unwrap().x());
+        line_coords.push(self.subpath_initial_point.as_ref().unwrap().y());
         self.perform_line(&Position::Absolute, &line_coords)
     }
 }
