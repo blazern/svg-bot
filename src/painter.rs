@@ -40,17 +40,17 @@ impl Painter {
                 self.validate_subpath_initial_point();
                 self.perform_close()?;
             },
+            &Command::HorizontalLine(ref position_type, ref params) => {
+                self.validate_subpath_initial_point();
+                self.perform_horizontal_line(&position_type, &params.to_vec())?;
+            },
+            &Command::VerticalLine(ref position_type, ref params) => {
+                self.validate_subpath_initial_point();
+                self.perform_vertical_line(&position_type, &params.to_vec())?;
+            },
             &Command::QuadraticCurve(_, ref params) => {
                 self.validate_subpath_initial_point();
                 print_params("QuadraticCurve", &params);
-            },
-            &Command::HorizontalLine(_, ref params) => {
-                self.validate_subpath_initial_point();
-                print_params("HorizontalLine", &params);
-            },
-            &Command::VerticalLine(_, ref params) => {
-                self.validate_subpath_initial_point();
-                print_params("VerticalLine", &params);
             },
             &Command::SmoothQuadraticCurve(_, ref params) => {
                 self.validate_subpath_initial_point();
@@ -173,6 +173,42 @@ impl Painter {
             }
         }
         
+        self.perform_line(&Position::Absolute, &line_coords)
+    }
+
+    fn perform_horizontal_line(&mut self, position_type: &Position, params: &Vec<f32>) -> Result<(), MyError> {
+        let mut line_coords: Vec<f32> = Vec::new();
+        let mut current_point = self.current_point.clone();
+        for &param in params {
+            match position_type {
+                &Position::Relative => {
+                    current_point = current_point.offset(param, 0f32);
+                }
+                &Position::Absolute => {
+                    current_point = SvgPoint::new(param, current_point.y(), &self.svg_area, &self.screen_area);
+                }
+            }
+            line_coords.push(current_point.x());
+            line_coords.push(current_point.y());
+        }
+        self.perform_line(&Position::Absolute, &line_coords)
+    }
+
+    fn perform_vertical_line(&mut self, position_type: &Position, params: &Vec<f32>) -> Result<(), MyError> {
+        let mut line_coords: Vec<f32> = Vec::new();
+        let mut current_point = self.current_point.clone();
+        for &param in params {
+            match position_type {
+                &Position::Relative => {
+                    current_point = current_point.offset(0f32, param);
+                }
+                &Position::Absolute => {
+                    current_point = SvgPoint::new(current_point.x(), param, &self.svg_area, &self.screen_area);
+                }
+            }
+            line_coords.push(current_point.x());
+            line_coords.push(current_point.y());
+        }
         self.perform_line(&Position::Absolute, &line_coords)
     }
 
