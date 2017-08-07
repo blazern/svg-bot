@@ -87,9 +87,19 @@ impl Painter {
     }
 
     fn perform_move(&mut self, position_type: &Position, params: &Vec<f32>) -> Result<(), MyError> {
+        assert!(params.len() >= 2);
         mouse::up()?;
-        // If move has more than 2 points than they must be treated as implicit line.
-        self.perform_line(position_type, params)
+
+        self.current_point = SvgPoint::new(*params.get(0).unwrap(), *params.get(1).unwrap(), &self.svg_area, &self.screen_area);
+        if params.len() > 2 {
+            // If move has more than 2 points than they must be treated as implicit line.
+            let mut params = params.clone();
+            params.remove(0);
+            params.remove(0);
+            return self.perform_line(position_type, &params)
+        } else {
+            return Ok(());
+        }
     }
 
     fn validate_subpath_initial_point(&mut self) {
@@ -105,12 +115,12 @@ impl Painter {
         let svg_area = &self.svg_area;
         let screen_area = &self.screen_area;
 
-        let mut current_point = SvgPoint::new(*params.get(0).unwrap(), *params.get(1).unwrap(), svg_area, screen_area);
+        let mut current_point = self.current_point.clone();
         let current_screen_point = ScreenPoint::from(current_point.clone());
         mouse::move_to(current_screen_point.x(), current_screen_point.y())?;
         mouse::down()?;
 
-        let mut index = 2;
+        let mut index = 0;
         while index < params.len() {
             let x = *params.get(index).unwrap();
             let y = *params.get(index + 1).unwrap();
