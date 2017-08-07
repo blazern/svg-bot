@@ -11,8 +11,6 @@ mod mouse;
 mod my_error;
 mod painter;
 
-use point::SvgPoint;
-use point::ScreenPoint;
 use rect::Rect;
 use painter::Painter;
 
@@ -57,25 +55,7 @@ fn ask_screen_coord(location_name: &str) -> (f32, f32) {
     println!("1");
     thread::sleep(Duration::from_millis(1000));
     
-    let output = std::process::Command::new("xdotool")
-                         .arg("getmouselocation")
-                         .output()
-                         .expect("Failed to read top left");
-
-    assert!(output.status.success());
-    let output = output.stdout;
-    let mut top_left_strs = std::str::from_utf8(&output).unwrap().split(" ");
-
-    let top_left_x_str = top_left_strs.nth(0).unwrap();
-    let top_left_y_str = top_left_strs.nth(0).unwrap();
-
-    let top_left_x_str = &top_left_x_str[2..];
-    let top_left_y_str = &top_left_y_str[2..];
-
-    let x = top_left_x_str.parse::<f32>().unwrap();
-    let y = top_left_y_str.parse::<f32>().unwrap();
-    println!("Location of {} is {} {}", location_name, x, y);
-    (x, y)
+    mouse::coords().unwrap()
 }
 
 fn get_svg_area(path_to_svg: &str) -> Rect {

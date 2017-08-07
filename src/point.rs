@@ -17,6 +17,7 @@ pub struct ScreenPoint {
     screen_area: Rect,
 }
 
+#[allow(dead_code)]
 impl SvgPoint {
     pub fn new(x: f32, y: f32, svg_area: &Rect, screen_area: &Rect) -> SvgPoint {
         SvgPoint{ x: x, y: y, svg_area: svg_area.clone(), screen_area: screen_area.clone() }
@@ -61,6 +62,7 @@ impl From<ScreenPoint> for SvgPoint {
     }
 }
 
+#[allow(dead_code)]
 impl ScreenPoint {
     pub fn new(x: f32, y: f32, svg_area: &Rect, screen_area: &Rect) -> ScreenPoint {
         ScreenPoint{ x: x, y: y, svg_area: svg_area.clone(), screen_area: screen_area.clone() }
