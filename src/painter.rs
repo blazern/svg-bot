@@ -24,47 +24,78 @@ impl Painter {
     pub fn perform_command(&mut self, command: &Command) -> Result<(), MyError> {
         match command {
             &Command::Move(ref position_type, ref params) => {
+                let params = params.to_vec();
+                self.reset_subpath_initial_point_by_move_command(&position_type, &params);
                 self.perform_move(&position_type, &params.to_vec())?;
             },
             &Command::Line(ref position_type, ref params) => {
+                self.validate_subpath_initial_point();
                 self.perform_line(&position_type, &params.to_vec())?;
             },
             &Command::CubicCurve(ref position_type, ref params) => {
+                self.validate_subpath_initial_point();
                 self.perform_cubic_curve(&position_type, &params.to_vec())?;
             },
             &Command::Close => {
+                self.validate_subpath_initial_point();
                 self.perform_close()?;
             },
-            &Command::QuadraticCurve(_, ref params) => print_params("QuadraticCurve", &params),
-            &Command::HorizontalLine(_, ref params) => print_params("HorizontalLine", &params),
-            &Command::VerticalLine(_, ref params) => print_params("VerticalLine", &params),
-            &Command::SmoothQuadraticCurve(_, ref params) => print_params("SmoothQuadraticCurve", &params),
-            &Command::SmoothCubicCurve(_, ref params) => print_params("SmoothCubicCurve", &params),
-            &Command::EllipticalArc(_, ref params) => print_params("EllipticalArc", &params),
+            &Command::QuadraticCurve(_, ref params) => {
+                self.validate_subpath_initial_point();
+                print_params("QuadraticCurve", &params);
+            },
+            &Command::HorizontalLine(_, ref params) => {
+                self.validate_subpath_initial_point();
+                print_params("HorizontalLine", &params);
+            },
+            &Command::VerticalLine(_, ref params) => {
+                self.validate_subpath_initial_point();
+                print_params("VerticalLine", &params);
+            },
+            &Command::SmoothQuadraticCurve(_, ref params) => {
+                self.validate_subpath_initial_point();
+                print_params("SmoothQuadraticCurve", &params);
+            },
+            &Command::SmoothCubicCurve(_, ref params) => {
+                self.validate_subpath_initial_point();
+                print_params("SmoothCubicCurve", &params);
+            },
+            &Command::EllipticalArc(_, ref params) => {
+                self.validate_subpath_initial_point();
+                print_params("EllipticalArc", &params);
+            },
         }
         Ok(())
     }
 
-    fn perform_move(&mut self, position_type: &Position, params: &Vec<f32>) -> Result<(), MyError> {
-        assert!(params.len() >= 2);
+    fn reset_subpath_initial_point_by_move_command(&mut self, move_position_type: &Position, move_params: &Vec<f32>) {
+        assert!(move_params.len() >= 2);
 
         let new_initial_x: f32;
         let new_initial_y: f32;
-        match position_type {
+        match move_position_type {
             &Position::Absolute => {
-                new_initial_x = *params.get(0).unwrap();
-                new_initial_y = *params.get(1).unwrap();
+                new_initial_x = *move_params.get(0).unwrap();
+                new_initial_y = *move_params.get(1).unwrap();
             }
             &Position::Relative => {
-                new_initial_x = *params.get(0).unwrap() + self.current_point.x();
-                new_initial_y = *params.get(1).unwrap() + self.current_point.y();
+                new_initial_x = *move_params.get(0).unwrap() + self.current_point.x();
+                new_initial_y = *move_params.get(1).unwrap() + self.current_point.y();
             }
         }
         self.subpath_initial_point = Some(SvgPoint::new(new_initial_x, new_initial_y, &self.svg_area, &self.screen_area));
+    }
 
+    fn perform_move(&mut self, position_type: &Position, params: &Vec<f32>) -> Result<(), MyError> {
         mouse::up()?;
         // If move has more than 2 points than they must be treated as implicit line.
         self.perform_line(position_type, params)
+    }
+
+    fn validate_subpath_initial_point(&mut self) {
+        if self.subpath_initial_point.is_none() {
+            self.subpath_initial_point = Some(self.current_point.clone());
+        }
     }
 
     fn perform_line(&mut self, position_type: &Position, params: &Vec<f32>) -> Result<(), MyError> {
@@ -144,7 +175,9 @@ impl Painter {
         line_coords.push(self.current_point.y());
         line_coords.push(self.subpath_initial_point.as_ref().unwrap().x());
         line_coords.push(self.subpath_initial_point.as_ref().unwrap().y());
-        self.perform_line(&Position::Absolute, &line_coords)
+        self.perform_line(&Position::Absolute, &line_coords)?;
+        self.subpath_initial_point = None;
+        Ok(())
     }
 }
 
